@@ -3,16 +3,17 @@ import { Platform, StyleSheet, Text, View, Alert } from 'react-native';
 import { Container, Header, Content, Tab, Tabs, Left, Body, Right, Button, Icon, Title, Spinner } from 'native-base';
 import CreateNew from './components/CreateNew';
 import ListItemToDo from './components/ListItemToDo';
+import queryString from 'query-string';
 
 export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
             inProgress: false,
-            FamilyListToDo: {
-                ShoppingList: [],
-                ToDoList: [],
-                TaskTypeList: []
+            familyListToDo: {
+                shoppingList: [],
+                toDoList: [],
+                taskTypeList: []
             }
         };
         this.downloadListToDo = this.downloadListToDo.bind(this);
@@ -25,12 +26,56 @@ export default class App extends Component {
         this.downloadListToDo();
     }
 
-    callCommandCompleteTask(item) {
+    async callCommandCompleteTask(item) {
+        let task = {
+            id: item.id
+        };
+        try {
+            let response = await fetch(
+                'http://192.168.1.50:5000/api/CompleteTask', {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: queryString.stringify(task)
+                }
+            );
+            this.simpleAlert("Выполнено")
+        } catch (error) {
+            this.simpleAlert("Ошибка")
+        }
         this.downloadListToDo();
     }
 
-    callCommandCreateTask(item) {
+    async callCommandCreateTask(item) {
+        let newTask = {
+            text: item.taskName,
+            taskType: item.taskTypeValue
+        };
+        try {
+            let response = await fetch(
+                'http://192.168.1.50:5000/api/CreateNewTask', {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: queryString.stringify(newTask)
+                }
+            );
+            this.simpleAlert("Добавлено")
+        } catch (error) {
+            this.simpleAlert("Ошибка")
+        }
         this.downloadListToDo();
+    }
+
+    simpleAlert(message) {
+        Alert.alert(
+            'Подтверждение выполнения',
+            message,
+            [
+                null,
+                null,
+                { text: 'Хорошо' },
+            ],
+            { cancelable: false },
+        );
     }
 
     completedTask(item) {
@@ -56,19 +101,12 @@ export default class App extends Component {
 
         try {
             let response = await fetch(
-                'https://facebook.github.io/react-native/movies.json',
-                //'https://catalog.onliner.by/wallmount?install_location%5B0%5D=tabletop&install_location%5Boperation%5D=union&order=price:asc',
+                'http://192.168.1.50:5000/api/GetFamilyListToDo',
             );
-            let responseJson = await response.json();
-
-            const temporaryData = {
-                ShoppingList: [{ Text: "Купить мясо", Id :1 }],
-                ToDoList: [{ Text: "Поменять лампочку", Id: 0 }],
-                TaskTypeList: [{ Text: "Покупка", Id: 0 }, { Text: "Задача", Id: 1 }]
-            };
+            let familyListToDo = await response.json();
 
             this.setState(state => ({
-                FamilyListToDo: temporaryData,
+                familyListToDo: familyListToDo,
                 inProgress: false
             }));
         } catch (error) {
@@ -102,14 +140,14 @@ export default class App extends Component {
                         <Tabs>
                             <Tab heading="Покупки">
                                 {/* <ShoppingList shoppingList={this.state.FamilyListToDo.ShoppingList} /> */}
-                                <ListItemToDo toDoList={this.state.FamilyListToDo.ShoppingList} completedButton={this.completedTask} />
+                                <ListItemToDo toDoList={this.state.familyListToDo.shoppingList} completedButton={this.completedTask} />
                             </Tab>
                             <Tab heading="Задачи">
                                 {/* <ToDoList toDoList={this.state.FamilyListToDo.ToDoList} /> */}
-                                <ListItemToDo toDoList={this.state.FamilyListToDo.ToDoList} completedButton={this.completedTask} />
+                                <ListItemToDo toDoList={this.state.familyListToDo.toDoList} completedButton={this.completedTask} />
                             </Tab>
                             <Tab heading="Добавить">
-                                <CreateNew TaskTypeList={this.state.FamilyListToDo.TaskTypeList} createButton={this.callCommandCreateTask} />
+                                <CreateNew taskTypeList={this.state.familyListToDo.taskTypeList} createButton={this.callCommandCreateTask} />
                             </Tab>
                         </Tabs>
                     </Content>

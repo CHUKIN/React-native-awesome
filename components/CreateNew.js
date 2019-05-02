@@ -6,27 +6,38 @@ export default class CreateNew extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            TaskName: "",
-            SelectedTaskType: null
+            taskName: "",
+            selectedTaskTypeValue: 0
         };
+        this.sendNewTask = this.sendNewTask.bind(this);
     }
 
     onValueChange(value) {
         this.setState({
-            SelectedTaskType: value
+            selectedTaskTypeValue: value
+        });
+    }
+
+    sendNewTask() {
+        this.props.createButton({
+            taskName: this.state.taskName,
+            taskTypeValue: this.state.selectedTaskTypeValue
+        })
+        this.setState({
+            taskName: ""
         });
     }
 
     render() {
-        var listOfPickerItems = this.props.TaskTypeList.map((element, index) => {
-            return <Picker.Item label={element.Text} value={element.Id} key={index} />
+        var listOfPickerItems = this.props.taskTypeList.map((element, index) => {
+            return <Picker.Item label={element.text} value={element.id} key={index} />
         })
         return (
             <Form>
                 <Item>
                     <Input placeholder="Название задачи"
-                        onChangeText={(TaskName) => this.setState({ TaskName })}
-                        value={this.state.TaskName}/>
+                        onChangeText={taskName => this.setState({ taskName })}
+                        value={this.state.taskName}/>
                 </Item>
                 <Item picker>
                     <Picker
@@ -36,15 +47,12 @@ export default class CreateNew extends Component {
                         placeholder="Выберите тип задачи"
                         placeholderStyle={{ color: "#bfc6ea" }}
                         placeholderIconColor="#007aff"
-                        selectedValue={this.state.SelectedTaskType}
+                        selectedValue={this.state.selectedTaskTypeValue}
                         onValueChange={this.onValueChange.bind(this)}>
                         {listOfPickerItems}
                     </Picker>
                 </Item>
-                <Button block onPress={() => this.props.createButton({
-                    TaskName: this.state.TaskName,
-                    TaskType: this.state.SelectedTaskType
-                })}>
+                <Button disabled={!this.state.taskName} block onPress={() => this.sendNewTask()}>
                     <Text>Добавить</Text>
                 </Button>
             </Form>

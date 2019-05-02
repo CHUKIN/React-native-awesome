@@ -12,7 +12,7 @@ export default class ListItemToDo extends Component {
             toDoListRender = this.props.toDoList.map((element, index) => {
                 return <ListItem key={index}>
                     <Body>
-                        <Text>{element.Text}</Text>
+                        <Text>{element.text}</Text>
                     </Body>
                     <Icon name='checkmark' onPress={()=>this.props.completedButton(element)}/>
                 </ListItem>
