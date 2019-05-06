@@ -32,7 +32,7 @@ export default class App extends Component {
         };
         try {
             let response = await fetch(
-                'http://192.168.1.50:5000/api/CompleteTask', {
+                'https://familylisttodo.azurewebsites.net/api/CompleteTask', {
                     method: "POST",
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: queryString.stringify(task)
@@ -52,7 +52,7 @@ export default class App extends Component {
         };
         try {
             let response = await fetch(
-                'http://192.168.1.50:5000/api/CreateNewTask', {
+                'https://familylisttodo.azurewebsites.net/api/CreateNewTask', {
                     method: "POST",
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: queryString.stringify(newTask)
@@ -101,7 +101,7 @@ export default class App extends Component {
 
         try {
             let response = await fetch(
-                'http://192.168.1.50:5000/api/GetFamilyListToDo',
+                'https://familylisttodo.azurewebsites.net/api/GetFamilyListToDo',
             );
             let familyListToDo = await response.json();
 
